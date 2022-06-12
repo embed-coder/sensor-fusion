@@ -1,0 +1,14 @@
+# IDE's dependencies
+.vscode
+
+# 3rd libraries
+googletest
+libserial
+
+# Compiling output
+build
+m2m-serial
+test_lins355
+
+# Runtime output
+*.csv
