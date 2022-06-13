@@ -12,13 +12,12 @@
 #define DEVICE_FILE "/dev/ttyUSB0"
 #define DATA_FILE "data.csv"
 
-std::vector<std::vector<float>> data_queue;
+std::vector<LINS355Data> data_queue;
 std::mutex mtx; // mutex for critical section
 
 void read_from_device(LINS355 *device)
 {
     LINS355Data *lins355_data;
-    std::vector<float> write_data;
 
     while (true)
     {
@@ -32,16 +31,14 @@ void read_from_device(LINS355 *device)
         }
         if (lins355_data)
         {
-            std::cout << "Accel x: " << lins355_data->accelX << std::endl;
-            write_data.push_back(lins355_data->accelX);
-            std::cout << "Accel y: " << lins355_data->accelY << std::endl;
-            write_data.push_back(lins355_data->accelY);
-            std::cout << "Accel z: " << lins355_data->accelZ << std::endl;
-            write_data.push_back(lins355_data->accelZ);
+            std::cout << "Timestamp: " << lins355_data->timestamp << std::endl;
+            std::cout << "Accel x: " << lins355_data->data.at(0) << std::endl;
+            std::cout << "Accel y: " << lins355_data->data.at(1) << std::endl;
+            std::cout << "Accel z: " << lins355_data->data.at(2) << std::endl;
             mtx.lock();
-            data_queue.push_back(write_data);
+            data_queue.push_back(*lins355_data);
             mtx.unlock();
-            write_data.clear();
+            delete lins355_data;
         }
         usleep(1000);
     }
@@ -67,7 +64,7 @@ int main(int argc, char **argv)
     LINS355Data *lins355_data;
     LINS355 *lins355_device = new LINS355(DEVICE_FILE, LibSerial::BaudRate::BAUD_115200, 100);
 
-    std::vector<std::string> columns{"Acc_x", "Acc_y", "Acc_z"};
+    std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
     M2M_CSV *m2m_csv = new M2M_CSV(DATA_FILE, columns);
     std::vector<float> write_data;
 

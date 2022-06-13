@@ -64,6 +64,7 @@ LINS355Data *LINS355::ReadData()
     DataBuffer read_buffer;
     uint16_t sensors[3];
     uint16_t crc;
+    std::chrono::_V2::system_clock::time_point timestamp = std::chrono::system_clock::now();
 
     // Wait for data to be available at the serial port.
     while (!serialPort.IsDataAvailable())
@@ -107,14 +108,21 @@ LINS355Data *LINS355::ReadData()
                 return NULL;
             }
 
+            timestamp = std::chrono::system_clock::now();
+
             sensors[0] = (uint16_t)(read_buffer[1] + (read_buffer[0] << 8));
             sensors[1] = (uint16_t)(read_buffer[3] + (read_buffer[2] << 8));
             sensors[2] = (uint16_t)(read_buffer[5] + (read_buffer[4] << 8));
 
+            ret_data->timestamp = std::to_string(std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count());
+            // std::cout << "timestamp: " << ret_data->timestamp << std::endl;
             // Accel x, y, z
-            ret_data->accelX = sensors[0] * ACCEL_SCALE / SENSOR_SCALE;
-            ret_data->accelY = sensors[1] * ACCEL_SCALE / SENSOR_SCALE;
-            ret_data->accelZ = sensors[2] * ACCEL_SCALE / SENSOR_SCALE;
+            // std::cout << "Accel_X: " << sensors[0] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+            ret_data->data.push_back(sensors[0] * ACCEL_SCALE / SENSOR_SCALE);
+            // std::cout << "Accel_Y: " << sensors[1] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+            ret_data->data.push_back(sensors[1] * ACCEL_SCALE / SENSOR_SCALE);
+            // std::cout << "Accel_Z: " << sensors[2] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+            ret_data->data.push_back(sensors[2] * ACCEL_SCALE / SENSOR_SCALE);
             break;
         }
         usleep(1000);

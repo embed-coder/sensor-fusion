@@ -57,7 +57,7 @@ M2M_CSV::M2M_CSV(const std::string &fileName, const std::vector<std::string> &co
 }
 M2M_CSV::~M2M_CSV() {}
 
-int M2M_CSV::Write(const std::vector<float> &data)
+int M2M_CSV::Write(const LINS355Data &data)
 {
     // Create an output filestream object
     std::ofstream of_csv(fileName, std::ios_base::app);
@@ -67,10 +67,11 @@ int M2M_CSV::Write(const std::vector<float> &data)
     //     throw std::runtime_error("Could not open file");
 
     // Send column names to the stream
-    for (int j = 0; j < data.size(); ++j)
+    of_csv << data.timestamp << ",";
+    for (int j = 0; j < data.data.size(); ++j)
     {
-        of_csv << data.at(j);
-        if (j != data.size() - 1)
+        of_csv << data.data.at(j);
+        if (j != data.data.size() - 1)
             of_csv << ","; // No comma at end of line
     }
     of_csv << "\n";
@@ -79,12 +80,13 @@ int M2M_CSV::Write(const std::vector<float> &data)
     return EXIT_SUCCESS;
 }
 
-std::vector<std::vector<float>> *M2M_CSV::Read(uint16_t col_num)
+std::vector<LINS355Data> *M2M_CSV::Read(uint16_t col_num)
 {
-    std::vector<std::vector<float>> *ret_data = new std::vector<std::vector<float>>(col_num);
+    std::vector<LINS355Data> *ret_data;
     std::string line, col_name;
     uint8_t col_i;
     float val;
+    bool isTimestamp;
 
     // Create an input filestream
     std::ifstream if_csv(fileName);
@@ -104,15 +106,23 @@ std::vector<std::vector<float>> *M2M_CSV::Read(uint16_t col_num)
             return NULL;
         }
 
+        ret_data = new std::vector<LINS355Data>;
+
         while (std::getline(if_csv, line))
         {
             // Create a stringstream of the current line
             std::stringstream ss(line);
 
+            isTimestamp = true;
             // Extract each integer
             while (ss >> val)
             {
-                ret_data->at(col_i++).push_back(val);
+                if (isTimestamp)
+                {
+                    isTimestamp = false;
+                    ret_data->at(col_i++).timestamp = val;
+                }
+                ret_data->at(col_i++).data.push_back(val);
 
                 // If the next token is a comma, ignore it and move on
                 if (ss.peek() == ',')
@@ -125,7 +135,7 @@ std::vector<std::vector<float>> *M2M_CSV::Read(uint16_t col_num)
     }
     else
     {
-        std::cout << "File doesnot exist" << std::endl;
+        std::cout << "File does not exist" << std::endl;
     }
 
     return ret_data;

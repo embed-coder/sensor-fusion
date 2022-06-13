@@ -8,13 +8,14 @@
 #include <iostream>
 #include <unistd.h>
 #include <vector>
+#include <chrono>
 
 #define DATA_LEN_AFTER_HEAD 35
 #define TIMEOUT_SERIAL_MS 250
-#define ACCEL_SCALE 20
-#define RATE_SCALE 1260
-#define MAG_SCALE 16
-#define SENSOR_SCALE 65536
+#define ACCEL_SCALE 20.0f
+#define RATE_SCALE 1260.0f
+#define MAG_SCALE 16.0f
+#define SENSOR_SCALE 65536.0f
 
 constexpr const char *const SERIAL_PORT_1 = "/dev/ttyUSB0";
 constexpr const char *const SERIAL_PORT_2 = "/dev/ttyUSB1";
@@ -23,9 +24,9 @@ typedef unsigned char BYTE;
 
 typedef struct LINS355Data
 {
-    float accelX;
-    float accelY;
-    float accelZ;
+    std::string timestamp;
+    // accelX, accelY, accelZ, ...
+    std::vector<float> data;
 } LINS355Data;
 
 using namespace LibSerial;

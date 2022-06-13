@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "LINS355.h"
+
 class M2M_CSV
 {
 private:
@@ -33,8 +35,8 @@ public:
     virtual ~M2M_CSV();
     // int Open();
     // void Close();
-    int Write(const std::vector<float> &data);
-    std::vector<std::vector<float>> *Read(uint16_t col_num);
+    int Write(const LINS355Data &data);
+    std::vector<LINS355Data> *Read(uint16_t col_num);
 };
 
 #endif /* M2M_CSV_H */

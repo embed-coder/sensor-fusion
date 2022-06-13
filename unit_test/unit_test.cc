@@ -36,9 +36,9 @@ TEST(LINS355_Device, OK)
     EXPECT_NE(lins355_data, nullptr);
 
     // Expect valid read data
-    EXPECT_EQ(lins355_data->accelX, 6);
-    EXPECT_EQ(lins355_data->accelY, 2);
-    EXPECT_EQ(lins355_data->accelZ, 3);
+    EXPECT_EQ(lins355_data->data.back(), 6); // Accel_X
+    EXPECT_EQ(lins355_data->data.back(), 2); // Accel_Y
+    EXPECT_EQ(lins355_data->data.back(), 3); // Accel_Z
 
     lins355_test->Close();
 
@@ -72,9 +72,9 @@ TEST(LINS355_Device, Open_FAIL)
     EXPECT_NE(lins355_data, nullptr);
 
     // Expect valid read data
-    EXPECT_EQ(lins355_data->accelX, 6);
-    EXPECT_EQ(lins355_data->accelY, 2);
-    EXPECT_EQ(lins355_data->accelZ, 3);
+    EXPECT_EQ(lins355_data->data.back(), 6); // Accel_X
+    EXPECT_EQ(lins355_data->data.back(), 2); // Accel_Y
+    EXPECT_EQ(lins355_data->data.back(), 3); // Accel_Z
 
     lins355_test->Close();
 
