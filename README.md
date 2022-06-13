@@ -122,7 +122,7 @@ Run SW with the real device: "./m2m-serial <device_file>"
 
 ## 📝 Todo <a name="todo"></a>
 
-The Bucket list for the future implemented feature:
+The Bucket list for the future implemented features:
 
 - Output logs to a file and set logging rotation.
 - Get version from git tag for auto naming the output packages.

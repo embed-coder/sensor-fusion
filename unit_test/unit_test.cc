@@ -25,20 +25,20 @@ TEST(LINS355_Device, OK)
 
     // Expect port is openned
     EXPECT_EQ(lins355_test->Open(), EXIT_SUCCESS);
-    EXPECT_EQ(lins355_test->IsOpen(), EXIT_SUCCESS);
+    EXPECT_EQ(lins355_test->IsOpen(), true);
 
     // Read data
     // echo -n -e "\x4C\x53\x53\x30\x1E\x00\x29\x00\x2D\xF3\x3E\x00\x02\xFF\xFE\xFF\xFC\xFD\xB6\xFA\x34\x05\x17\x1E\x74\x1E\x74\x1E\x74\x1E\x74\x29\xF6\x00\x00\x01\x25" > /dev/ttyUSB1
-    system("sleep 1 && echo -n -e \"\\x4C\\x53\\x53\\x30\\x1E\\x00\\x29\\x00\\x2D\\xF3\\x3E\\x00\\x02\\xFF\\xFE\\xFF\\xFC\\xFD\\xB6\\xFA\\x34\\x05\\x17\\x1E\\x74\\x1E\\x74\\x1E\\x74\\x1E\\x74\\x29\\xF6\\x00\\x00\\x01\\x25\" > /dev/ttyUSB1");
+    system("sudo ./send_test_data.sh");
     lins355_data = lins355_test->ReadData();
 
     // Expect not null pointer returned
     EXPECT_NE(lins355_data, nullptr);
 
     // Expect valid read data
-    EXPECT_EQ(lins355_data->data.back(), 6); // Accel_X
-    EXPECT_EQ(lins355_data->data.back(), 2); // Accel_Y
-    EXPECT_EQ(lins355_data->data.back(), 3); // Accel_Z
+    EXPECT_EQ(lins355_data->data.back(), 6.49902f); // Accel_X
+    EXPECT_EQ(lins355_data->data.back(), 2.34375f); // Accel_Y
+    EXPECT_EQ(lins355_data->data.back(), 3.20312f); // Accel_Z
 
     lins355_test->Close();
 
@@ -54,30 +54,9 @@ TEST(LINS355_Device, OK)
 TEST(LINS355_Device, Open_FAIL)
 {
     LINS355 *lins355_test = new LINS355(DEVICE_FILE_3, LibSerial::BaudRate::BAUD_115200, 100);
-    LINS355Data *lins355_data;
 
     // Expect not null pointer returned
     EXPECT_EQ(lins355_test, nullptr);
 
-    // Expect port is openned
-    EXPECT_EQ(lins355_test->Open(), EXIT_FAILURE);
-    EXPECT_EQ(lins355_test->IsOpen(), EXIT_FAILURE);
-
-    // Read data
-    // echo -n -e "\x4C\x53\x53\x30\x1E\x00\x29\x00\x2D\xF3\x3E\x00\x02\xFF\xFE\xFF\xFC\xFD\xB6\xFA\x34\x05\x17\x1E\x74\x1E\x74\x1E\x74\x1E\x74\x29\xF6\x00\x00\x01\x25" > /dev/ttyUSB1
-    system("sleep 1 && echo -n -e \"\\x4C\\x53\\x53\\x30\\x1E\\x00\\x29\\x00\\x2D\\xF3\\x3E\\x00\\x02\\xFF\\xFE\\xFF\\xFC\\xFD\\xB6\\xFA\\x34\\x05\\x17\\x1E\\x74\\x1E\\x74\\x1E\\x74\\x1E\\x74\\x29\\xF6\\x00\\x00\\x01\\x25\" > /dev/ttyUSB1");
-    lins355_data = lins355_test->ReadData();
-
-    // Expect not null pointer returned
-    EXPECT_NE(lins355_data, nullptr);
-
-    // Expect valid read data
-    EXPECT_EQ(lins355_data->data.back(), 6); // Accel_X
-    EXPECT_EQ(lins355_data->data.back(), 2); // Accel_Y
-    EXPECT_EQ(lins355_data->data.back(), 3); // Accel_Z
-
-    lins355_test->Close();
-
     delete lins355_test;
-    delete lins355_data;
 }
