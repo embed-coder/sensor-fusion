@@ -1,6 +1,6 @@
 #include "m2m_csv.h"
 
-M2M_CSV::M2M_CSV(const std::string &fileName, const std::vector<std::string> &columns) : fileName(fileName), columns(columns)
+M2M_CSV::M2M_CSV(const std::string &file_name, const std::vector<std::string> &columns) : fileName(file_name), columns(columns)
 {
     std::string line, colname;
 

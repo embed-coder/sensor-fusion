@@ -3,8 +3,8 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-
 #include <unistd.h>
+#include <ctime>
 
 #include "LINS355.h"
 #include "m2m_csv.h"
@@ -15,7 +15,7 @@
 std::vector<LINS355Data> data_queue;
 std::mutex mtx; // mutex for critical section
 
-void read_from_device(LINS355 *device)
+void read_from_device(LINS355 *device, u_int16_t interval_ms)
 {
     LINS355Data *lins355_data;
 
@@ -38,38 +38,146 @@ void read_from_device(LINS355 *device)
             mtx.lock();
             data_queue.push_back(*lins355_data);
             mtx.unlock();
+            std::cout << "read_from_device JCheck 1" << std::endl;
             delete lins355_data;
+            std::cout << "read_from_device JCheck 2" << std::endl;
+        }
+        usleep(interval_ms * 1000);
+    }
+}
+
+void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minute, const std::vector<std::string> &columns)
+{
+    std::string data_file;
+    M2M_CSV *m2m_csv;
+    int prev_min = -1;
+    std::string yyyy;
+    std::string mm;
+    std::string dd;
+    std::string hh;
+    std::string min;
+    int tm_min;
+
+    while (true)
+    {
+        time_t now = time(0);
+        tm *gmtm = gmtime(&now);
+
+        if ((gmtm->tm_min % span_minute == 0 && prev_min != gmtm->tm_min) || prev_min == -1)
+        {
+            if (m2m_csv)
+            {
+                std::cout << "write_2_csv JCheck 1" << std::endl;
+                delete m2m_csv;
+            }
+            prev_min = gmtm->tm_min;
+            yyyy = std::to_string(1900 + gmtm->tm_year);
+
+            mm = (gmtm->tm_mon < 10) ? "0" : "";
+            mm.append(std::to_string(gmtm->tm_mon));
+
+            dd = (gmtm->tm_mday < 10) ? "0" : "";
+            dd.append(std::to_string(gmtm->tm_mday));
+
+            hh = (gmtm->tm_hour < 10) ? "0" : "";
+            hh.append(std::to_string(gmtm->tm_hour));
+
+            if (gmtm->tm_min % span_minute != 0)
+            {
+                tm_min = (gmtm->tm_min / span_minute) * span_minute;
+            }
+            min = (tm_min < 10) ? "0" : "";
+            min.append(std::to_string(tm_min));
+
+            data_file = data_file_prefix + "_" + yyyy + mm + dd + "_" + hh + min + ".csv";
+
+            std::cout << "data_file: " << data_file << std::endl;
+
+            m2m_csv = new M2M_CSV(data_file, columns);
+            data_file.clear();
+        }
+
+        if (m2m_csv)
+        {
+            mtx.lock();
+            if (data_queue.empty() == false)
+            {
+                m2m_csv->Write(data_queue.back());
+                data_queue.pop_back();
+            }
+            mtx.unlock();
         }
         usleep(1000);
     }
 }
 
-void write_2_csv(M2M_CSV *csv_service)
+void help(std::string app_name)
 {
-    while (true)
-    {
-        mtx.lock();
-        if (data_queue.empty() == false)
-        {
-            csv_service->Write(data_queue.back());
-            data_queue.pop_back();
-        }
-        mtx.unlock();
-        usleep(1000);
-    }
+    std::cout << app_name << " is the application to read acceleration data from LINS355 device that connect to Serial port \n\
+    Usage : " << app_name
+              << " [OPTIONS] [Parameters] \n\
+                -d <device_file>        The serial port device file \n\
+                                        ex: /dev/ttyUSB0 \n\
+                -f <data_file_prefix>   The path to the csv data file \n\
+                                        ex: data \n\
+                                        default: acc_YYYYMMDD_hhmm.csv \n\
+                -h                      Display this message \n\
+                -i <interval_ms>        [Optional] The interval in milisecond \n\
+                                        ex: 100 \n\
+                                        default: 10 (10 ms = 0.01 s = 100 Hz)\n";
 }
 
 int main(int argc, char **argv)
 {
-    LINS355Data *lins355_data;
-    LINS355 *lins355_device = new LINS355(DEVICE_FILE, LibSerial::BaudRate::BAUD_115200, 100);
+    int opt;
+    std::string device_file;
+    std::string data_file_prefix = "acc";
+    uint16_t interval_ms = 10; // 100 HZ = 0.01 s = 10 ms
+    LINS355 *lins355_device;
 
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
-    M2M_CSV *m2m_csv = new M2M_CSV(DATA_FILE, columns);
-    std::vector<float> write_data;
 
-    std::thread lins355_thread(read_from_device, lins355_device);
-    std::thread csv_thread(write_2_csv, m2m_csv);
+    if (argc < 2)
+    {
+        help(argv[0]);
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        while ((opt = getopt(argc, argv, "d:f:hi:")) != -1)
+        {
+            switch (opt)
+            {
+            case 'd':
+                device_file = optarg;
+                break;
+            case 'f':
+                data_file_prefix = optarg;
+                break;
+            case 'h':
+                help(argv[0]);
+                return EXIT_SUCCESS;
+            case 'i':
+                interval_ms = atoi(optarg);
+                break;
+            default:
+                std::cerr << "Run \"" << argv[0] << " -h\" for help" << std::endl;
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
+    if (device_file.empty())
+    {
+        std::cerr << "No input for serial port" << std::endl;
+        std::cerr << "Run \"" << argv[0] << " -h\" for help" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    lins355_device = new LINS355(device_file, LibSerial::BaudRate::BAUD_115200, 100);
+
+    std::thread lins355_thread(read_from_device, lins355_device, interval_ms);
+    std::thread csv_thread(write_2_csv, data_file_prefix, 5, columns);
 
     while (true)
     {
