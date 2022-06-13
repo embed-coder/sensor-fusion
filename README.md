@@ -66,7 +66,7 @@ acc_YYYYMMDD_hhmm.csv. For eg, “acc_20220609_1240.csv”
 
 Clone project from this repository or download the source files in compressed format in the list of release packages.
 
-### Prerequisites
+### ➡️ Prerequisites
 
 Dependencies:
 
@@ -114,7 +114,7 @@ The output will be like below
 
 ### 🚀 Running SW
 
-Run SW with the real device with format "./m2m-serial <device_file>"
+Run SW with the real device: "./m2m-serial <device_file>"
 
 ```
 ./m2m-serial /dev/ttyUSB0
@@ -122,9 +122,13 @@ Run SW with the real device with format "./m2m-serial <device_file>"
 
 ## 📝 Todo <a name="todo"></a>
 
-Bucket list for the future features should be implemented for good:
+The Bucket list for the future implemented feature:
 
+- Output logs to a file and set logging rotation.
 - Get version from git tag for auto naming the output packages.
+- Configuration for SW from json file.
+- Replace data storing by a real time database for a better management and scalability.
+- Documentation for software and solution architecture (UML & Graph).
 
 ## ✍️ Authors <a name = "authors"></a>
 
