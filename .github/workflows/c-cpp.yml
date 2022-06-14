@@ -35,9 +35,8 @@ jobs:
                     pkg-config libserial-dev
     - name: compilation
       run: ./build.sh
-    - name: set virtual serial port
-      run: sudo socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11 &
     - name: run unit test
       run: |
         sudo su
+        socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11 &
         export DEVICE_FILE_1=/dev/ttyS10 && export DEVICE_FILE_2=/dev/ttyS11 && ./test_lins355
