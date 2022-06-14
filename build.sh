@@ -42,17 +42,15 @@ rm ${BUILDLOG}
 info "Start compiling SW"
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib/
 
-cd ../..
-
 mkdir build
 cd build
-cmake ..
-make
+cmake ..  | tee -a ${BUILDLOG}
+make  | tee -a ${BUILDLOG}
 mkdir ../release
 mv m2m-serial ../
 mv unit_test/test_lins355 ../
 cd ..
-rm -rf build
+# rm -rf build
 
 info "Run SW by the bin file: m2m-serial"
 info "Run unit testing by the bin file: unit_test"
