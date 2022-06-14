@@ -36,12 +36,4 @@ jobs:
     - name: compilation
       run: ./build.sh
     - name: run unit test
-<<<<<<< HEAD
       run: sudo ./run_test.sh
-=======
-      run: |
-        sudo su
-        socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11 &
-        ls /dev/tty*
-        export DEVICE_FILE_1=/dev/ttyS10 && export DEVICE_FILE_2=/dev/ttyS11 && ./test_lins355
->>>>>>> ccb7106e72e80a4495c35ca45b219c9249b454c2
