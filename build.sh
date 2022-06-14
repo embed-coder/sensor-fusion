@@ -47,8 +47,8 @@ cd build
 cmake ..  | tee -a ${BUILDLOG}
 make  | tee -a ${BUILDLOG}
 mkdir ../release
-mv m2m-serial ../
-mv unit_test/test_lins355 ../
+cp m2m-serial ../
+cp unit_test/test_lins355 ../
 cd ..
 # rm -rf build
 

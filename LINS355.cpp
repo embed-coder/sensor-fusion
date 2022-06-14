@@ -96,6 +96,7 @@ LINS355Data *LINS355::ReadData()
                 continue;
             }
 
+            std::cout << std::endl;
             for (int i = 0; i < DATA_LEN_AFTER_HEAD; i++)
             {
                 printf("%x ", read_buffer[i]);

@@ -11,6 +11,7 @@
 
 #define DEVICE_FILE "/dev/ttyUSB0"
 #define DATA_FILE "data.csv"
+#define SPAN_MINUTES 5 // data file will be create every 5 minutes span window
 
 std::vector<LINS355Data> data_queue;
 std::mutex mtx; // mutex for critical section
@@ -71,7 +72,7 @@ void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minut
             yyyy = std::to_string(1900 + gmtm->tm_year);
 
             mm = (gmtm->tm_mon < 10) ? "0" : "";
-            mm.append(std::to_string(gmtm->tm_mon));
+            mm.append(std::to_string(gmtm->tm_mon + 1));
 
             dd = (gmtm->tm_mday < 10) ? "0" : "";
             dd.append(std::to_string(gmtm->tm_mday));
@@ -79,9 +80,10 @@ void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minut
             hh = (gmtm->tm_hour < 10) ? "0" : "";
             hh.append(std::to_string(gmtm->tm_hour));
 
+            tm_min = gmtm->tm_min;
             if (gmtm->tm_min % span_minute != 0)
             {
-                tm_min = (gmtm->tm_min / span_minute) * span_minute;
+                tm_min = (tm_min / span_minute) * span_minute;
             }
             min = (tm_min < 10) ? "0" : "";
             min.append(std::to_string(tm_min));
@@ -96,13 +98,13 @@ void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minut
 
         if (m2m_csv)
         {
-            mtx.lock();
             if (data_queue.empty() == false)
             {
+                mtx.lock();
                 m2m_csv->Write(data_queue.back());
                 data_queue.pop_back();
+                mtx.unlock();
             }
-            mtx.unlock();
         }
         usleep(1000);
     }
@@ -174,7 +176,7 @@ int main(int argc, char **argv)
     lins355_device = new LINS355(device_file, LibSerial::BaudRate::BAUD_115200, 100);
 
     std::thread lins355_thread(read_from_device, lins355_device, interval_ms);
-    std::thread csv_thread(write_2_csv, data_file_prefix, 5, columns);
+    std::thread csv_thread(write_2_csv, data_file_prefix, SPAN_MINUTES, columns);
 
     while (true)
     {

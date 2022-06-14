@@ -117,7 +117,7 @@ The output will be like below
 Run SW with the real device: "./m2m-serial <device_file>"
 
 ```
-./m2m-serial /dev/ttyUSB0
+./m2m-serial -d /dev/ttyUSB0
 ```
 
 ## 📝 Todo <a name="todo"></a>
