@@ -1,0 +1,39 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install dependencies
+      run: |
+        apt update
+        apt install -y gcc g++ git autogen autoconf build-essential \
+                    cmake graphviz libgtest-dev libtool \
+                    pkg-config libserial-dev
+    - name: compilation
+      run: ./build.sh
+      
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install dependencies
+      run: |
+        apt update
+        apt install -y gcc g++ git autogen autoconf build-essential \
+                    cmake graphviz libgtest-dev libtool \
+                    pkg-config libserial-dev
+    - name: compilation
+      run: ./build.sh
+    - name: run unit test
+      run: ./test_lins355
