@@ -39,4 +39,5 @@ jobs:
       run: sudo socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11 &
     - name: run unit test
       run: |
-        sudo su && export DEVICE_FILE_1=/dev/ttyS10 && export DEVICE_FILE_2=/dev/ttyS11 && ./test_lins355
+        sudo su
+        export DEVICE_FILE_1=/dev/ttyS10 && export DEVICE_FILE_2=/dev/ttyS11 && ./test_lins355
