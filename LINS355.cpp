@@ -24,7 +24,8 @@ LINS355::LINS355(const std::string &fileName, const LibSerial::BaudRate &baudRat
 
 LINS355::~LINS355()
 {
-    serialPort.Close();
+    if (serialPort.IsOpen())
+        serialPort.Close();
 }
 
 int LINS355::Open()
