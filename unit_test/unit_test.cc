@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include <thread>
 
 #include "../LINS355.h"
@@ -8,8 +9,11 @@
 
 #define DEVICE_FILE_1 "/dev/ttyUSB0"
 #define DEVICE_FILE_2 "/dev/ttyUSB1"
-#define DEVICE_FILE_3 "/dev/ttyUSB2"
 #define DATA_FILE "data.csv"
+
+std::string device_file_1;
+std::string device_file_2;
+std::string data_file;
 
 LINS355Data *lins355_data;
 void read_from_device(LINS355 *device, u_int16_t interval_ms)
@@ -31,14 +35,23 @@ void read_from_device(LINS355 *device, u_int16_t interval_ms)
  */
 TEST(LINS355_Device, OK)
 {
-    LINS355 *lins355_test = new LINS355(DEVICE_FILE_1, LibSerial::BaudRate::BAUD_115200, 100);
+    const char *env_device_file_1 = std::getenv("DEVICE_FILE_1");
+    device_file_1 = (env_device_file_1) ? std::string(env_device_file_1) : DEVICE_FILE_1;
+    const char *env_device_file_2 = std::getenv("DEVICE_FILE_2");
+    device_file_2 = (env_device_file_2) ? std::string(env_device_file_2) : DEVICE_FILE_2;
+    const char *env_data_file = std::getenv("DATA_FILE");
+    data_file = (env_data_file) ? std::string(env_data_file) : DATA_FILE;
+
+    LINS355 *lins355_test = new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100);
 
     // Expect port is openned
     EXPECT_EQ(lins355_test->IsOpen(), true);
 
     // Read data
     std::thread read_thread(read_from_device, lins355_test, 1);
-    system("bash test_script.sh OK");
+    // system("bash test_script.sh LINS355_Device_OK");
+    std::string command = "bash test_script.sh LINS355_Device_OK " + data_file + " " + device_file_2;
+    system(command.c_str());
     read_thread.join();
 
     // Expect not null pointer returned
@@ -65,14 +78,16 @@ TEST(LINS355_Device, OK)
  */
 TEST(LINS355_Device, FAIL_CRC_Error)
 {
-    LINS355 *lins355_test = new LINS355(DEVICE_FILE_1, LibSerial::BaudRate::BAUD_115200, 100);
+    LINS355 *lins355_test = new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100);
 
     // Expect port is openned
     EXPECT_EQ(lins355_test->IsOpen(), true);
 
     // Read data
     std::thread read_thread(read_from_device, lins355_test, 1);
-    system("bash test_script.sh FAIL_CRC");
+    // system("bash test_script.sh FAIL_CRC");
+    std::string command = "bash test_script.sh FAIL_CRC " + data_file + " " + device_file_2;
+    system(command.c_str());
     read_thread.join();
 
     // Expect null pointer returned because of CRC error
@@ -87,7 +102,6 @@ TEST(LINS355_Device, FAIL_CRC_Error)
     delete lins355_data;
 }
 
-#define DATA_FILE "data.csv"
 /**
  * @brief Test creating, writing, reading data on csv file
  *  Test env: data will be write and read on data.csv
@@ -95,7 +109,7 @@ TEST(LINS355_Device, FAIL_CRC_Error)
 TEST(M2M_CSV, OK)
 {
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
-    M2M_CSV *m2m_csv = new M2M_CSV(DATA_FILE, columns);
+    M2M_CSV *m2m_csv = new M2M_CSV(data_file, columns);
     LINS355Data data{
         .timestamp = "1655163581",
         .data = {
@@ -129,14 +143,13 @@ TEST(M2M_CSV, FAIL_DataFile_Invalid_Column_Name)
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
 
     // Create an invalid colomn name data file
-    std::string command = "bash test_script.sh FAIL_DataFile_Invalid_Column_Name ";
-    command.append(DATA_FILE);
+    std::string command = "bash test_script.sh FAIL_DataFile_Invalid_Column_Name " + data_file + " " + device_file_2;
     system(command.c_str());
 
     M2M_CSV *m2m_csv;
     try
     {
-        m2m_csv = new M2M_CSV(DATA_FILE, columns);
+        m2m_csv = new M2M_CSV(data_file, columns);
     }
     catch (...)
     {
@@ -149,8 +162,7 @@ TEST(M2M_CSV, FAIL_DataFile_Invalid_Column_Name)
     EXPECT_EQ(m2m_csv, nullptr);
 
     // Delete the invalid file after the test case
-    command = "sudo rm -f ";
-    command.append(DATA_FILE);
+    command = "sudo rm -f " + data_file;
     system(command.c_str());
 }
 
@@ -166,7 +178,7 @@ TEST(M2M_CSV, FAIL_DataFile_Non_Existing)
     M2M_CSV *m2m_csv;
     try
     {
-        m2m_csv = new M2M_CSV(DATA_FILE, columns);
+        m2m_csv = new M2M_CSV(data_file, columns);
     }
     catch (const std::runtime_error &e)
     {
@@ -179,8 +191,7 @@ TEST(M2M_CSV, FAIL_DataFile_Non_Existing)
     EXPECT_NE(m2m_csv, nullptr);
 
     // Delete the file before running the test case
-    std::string command = "bash test_script.sh FAIL_DataFile_Non_Existing ";
-    command.append(DATA_FILE);
+    std::string command = "bash test_script.sh FAIL_DataFile_Non_Existing " + data_file + " " + device_file_2;
     system(command.c_str());
 
     read_data = m2m_csv->Read();
