@@ -7,6 +7,7 @@ libserial
 
 # Compiling output
 build
+build.log
 m2m-serial
 test_lins355
 
