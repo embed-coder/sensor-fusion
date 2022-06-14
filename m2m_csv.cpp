@@ -26,7 +26,7 @@ M2M_CSV::M2M_CSV(const std::string &file_name, const std::vector<std::string> &c
 
             if (!std::equal(columns.begin(), columns.end(), columns_from_file.begin()))
             {
-                throw std::runtime_error("File exists with incorrect colum names");
+                throw std::runtime_error("File exists with invalid colum names");
             }
 
             if_csv.close();
@@ -62,10 +62,6 @@ int M2M_CSV::Write(const LINS355Data &data)
     // Create an output filestream object
     std::ofstream of_csv(fileName, std::ios_base::app);
 
-    // Make sure the file is open
-    // if (!of_csv.is_open())
-    //     throw std::runtime_error("Could not open file");
-
     // Send column names to the stream
     of_csv << data.timestamp << ",";
     for (int j = 0; j < data.data.size(); ++j)
@@ -80,12 +76,12 @@ int M2M_CSV::Write(const LINS355Data &data)
     return EXIT_SUCCESS;
 }
 
-std::vector<LINS355Data> *M2M_CSV::Read(uint16_t col_num)
+std::vector<LINS355Data> *M2M_CSV::Read()
 {
     std::vector<LINS355Data> *ret_data;
     std::string line, col_name;
-    uint8_t col_i;
-    float val;
+    uint8_t row_i = 0;
+    std::string token;
     bool isTimestamp;
 
     // Create an input filestream
@@ -93,7 +89,8 @@ std::vector<LINS355Data> *M2M_CSV::Read(uint16_t col_num)
     // Make sure the file is open
     if (!if_csv.is_open())
     {
-        throw std::runtime_error("Could not open file");
+        std::cout << "Could not open file" << std::endl;
+        return NULL;
     }
 
     if (if_csv.good())
@@ -105,37 +102,39 @@ std::vector<LINS355Data> *M2M_CSV::Read(uint16_t col_num)
             std::cout << "File empty" << std::endl;
             return NULL;
         }
+        std::cout << col_name << std::endl;
 
         ret_data = new std::vector<LINS355Data>;
 
         while (std::getline(if_csv, line))
         {
+            std::cout << line << std::endl;
             // Create a stringstream of the current line
             std::stringstream ss(line);
 
             isTimestamp = true;
             // Extract each integer
-            while (ss >> val)
+            while (std::getline(ss, token, ','))
             {
+                std::cout << "token:" << token << std::endl;
                 if (isTimestamp)
                 {
                     isTimestamp = false;
-                    ret_data->at(col_i++).timestamp = val;
+                    ret_data->push_back(LINS355Data{.timestamp = token});
                 }
-                ret_data->at(col_i++).data.push_back(val);
-
-                // If the next token is a comma, ignore it and move on
-                if (ss.peek() == ',')
-                    ss.ignore();
+                else
+                {
+                    ret_data->at(row_i).data.push_back(stof(token));
+                }
             }
-            col_i = 0;
+            row_i++;
         }
 
         if_csv.close();
     }
     else
     {
-        std::cout << "File does not exist" << std::endl;
+        std::cout << "File is not good to read" << std::endl;
     }
 
     return ret_data;

@@ -9,6 +9,7 @@
 #include <utility>   // std::pair
 #include <stdexcept> // std::runtime_error
 #include <sstream>   // std::stringstream
+#include <iomanip>   //for std::setprecision
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,7 +37,7 @@ public:
     // int Open();
     // void Close();
     int Write(const LINS355Data &data);
-    std::vector<LINS355Data> *Read(uint16_t col_num);
+    std::vector<LINS355Data> *Read();
 };
 
 #endif /* M2M_CSV_H */
