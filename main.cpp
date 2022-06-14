@@ -38,9 +38,7 @@ void read_from_device(LINS355 *device, u_int16_t interval_ms)
             mtx.lock();
             data_queue.push_back(*lins355_data);
             mtx.unlock();
-            std::cout << "read_from_device JCheck 1" << std::endl;
             delete lins355_data;
-            std::cout << "read_from_device JCheck 2" << std::endl;
         }
         usleep(interval_ms * 1000);
     }
@@ -67,7 +65,6 @@ void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minut
         {
             if (m2m_csv)
             {
-                std::cout << "write_2_csv JCheck 1" << std::endl;
                 delete m2m_csv;
             }
             prev_min = gmtm->tm_min;
