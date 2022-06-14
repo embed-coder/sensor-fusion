@@ -28,6 +28,21 @@ void read_from_device(LINS355 *device, u_int16_t interval_ms)
     }
 }
 
+void get_env()
+{
+    const char *env_device_file_1 = std::getenv("DEVICE_FILE_1");
+    device_file_1 = (env_device_file_1) ? std::string(env_device_file_1) : DEVICE_FILE_1;
+    std::cout << "device_file_1: " << device_file_1 << std::endl;
+
+    const char *env_device_file_2 = std::getenv("DEVICE_FILE_2");
+    device_file_2 = (env_device_file_2) ? std::string(env_device_file_2) : DEVICE_FILE_2;
+    std::cout << "device_file_2: " << device_file_2 << std::endl;
+
+    const char *env_data_file = std::getenv("DATA_FILE");
+    data_file = (env_data_file) ? std::string(env_data_file) : DATA_FILE;
+    std::cout << "data_file: " << data_file << std::endl;
+}
+
 /**
  * @brief Test OK for all the cases related to LINS355 device
  *  Test env: loop connection between /dev/ttyUSB0 and /dev/ttyUSB1
@@ -35,13 +50,7 @@ void read_from_device(LINS355 *device, u_int16_t interval_ms)
  */
 TEST(LINS355_Device, OK)
 {
-    const char *env_device_file_1 = std::getenv("DEVICE_FILE_1");
-    device_file_1 = (env_device_file_1) ? std::string(env_device_file_1) : DEVICE_FILE_1;
-    const char *env_device_file_2 = std::getenv("DEVICE_FILE_2");
-    device_file_2 = (env_device_file_2) ? std::string(env_device_file_2) : DEVICE_FILE_2;
-    const char *env_data_file = std::getenv("DATA_FILE");
-    data_file = (env_data_file) ? std::string(env_data_file) : DATA_FILE;
-
+    get_env();
     LINS355 *lins355_test = new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100);
 
     // Expect port is openned
