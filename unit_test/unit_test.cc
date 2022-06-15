@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <thread>
+#include <cassert>
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #include "../LINS355.h"
 #include "../m2m_csv.h"
@@ -51,13 +57,13 @@ void get_env()
 TEST(LINS355_Device, OK)
 {
     get_env();
-    LINS355 *lins355_test = new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100);
+    std::auto_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
 
     // Expect port is openned
-    EXPECT_EQ(lins355_test->IsOpen(), true);
+    EXPECT_EQ(lins355_test.get()->IsOpen(), true);
 
     // Read data
-    std::thread read_thread(read_from_device, lins355_test, 1);
+    std::thread read_thread(read_from_device, lins355_test.get(), 1);
     // system("bash test_script.sh LINS355_Device_OK");
     std::string command = "bash test_script.sh LINS355_Device_OK " + data_file + " " + device_file_2;
     system(command.c_str());
@@ -71,12 +77,11 @@ TEST(LINS355_Device, OK)
     EXPECT_FLOAT_EQ(lins355_data->data.at(1), 2.343750f); // Accel_Y
     EXPECT_FLOAT_EQ(lins355_data->data.at(2), 3.203125f); // Accel_Z
 
-    lins355_test->Close();
+    lins355_test.get()->Close();
 
     // Expect port is closed
-    EXPECT_EQ(lins355_test->IsOpen(), false);
+    EXPECT_EQ(lins355_test.get()->IsOpen(), false);
 
-    delete lins355_test;
     delete lins355_data;
 }
 
@@ -87,13 +92,13 @@ TEST(LINS355_Device, OK)
  */
 TEST(LINS355_Device, FAIL_CRC_Error)
 {
-    LINS355 *lins355_test = new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100);
+    std::auto_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
 
     // Expect port is openned
-    EXPECT_EQ(lins355_test->IsOpen(), true);
+    EXPECT_EQ(lins355_test.get()->IsOpen(), true);
 
     // Read data
-    std::thread read_thread(read_from_device, lins355_test, 1);
+    std::thread read_thread(read_from_device, lins355_test.get(), 1);
     // system("bash test_script.sh FAIL_CRC");
     std::string command = "bash test_script.sh FAIL_CRC " + data_file + " " + device_file_2;
     system(command.c_str());
@@ -102,12 +107,11 @@ TEST(LINS355_Device, FAIL_CRC_Error)
     // Expect null pointer returned because of CRC error
     EXPECT_EQ(lins355_data, nullptr);
 
-    lins355_test->Close();
+    lins355_test.get()->Close();
 
     // Expect port is closed
-    EXPECT_EQ(lins355_test->IsOpen(), false);
+    EXPECT_EQ(lins355_test.get()->IsOpen(), false);
 
-    delete lins355_test;
     delete lins355_data;
 }
 
@@ -118,7 +122,7 @@ TEST(LINS355_Device, FAIL_CRC_Error)
 TEST(M2M_CSV, OK)
 {
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
-    M2M_CSV *m2m_csv = new M2M_CSV(data_file, columns);
+    std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
     LINS355Data data{
         .timestamp = "1655163581",
         .data = {
@@ -127,20 +131,18 @@ TEST(M2M_CSV, OK)
             3.20312f}};
 
     // Expect not null pointer returned
-    EXPECT_NE(m2m_csv, nullptr);
+    EXPECT_NE(m2m_csv.get(), nullptr);
 
     // Expect successful writing returned
-    EXPECT_EQ(m2m_csv->Write(data), EXIT_SUCCESS);
+    EXPECT_EQ(m2m_csv.get()->Write(data), EXIT_SUCCESS);
 
-    std::vector<LINS355Data> *read_data = m2m_csv->Read();
+    std::vector<LINS355Data> *read_data = m2m_csv.get()->Read();
 
     // Expect valid read data
     EXPECT_EQ(read_data->at(0).timestamp, "1655163581");           // Timestamp
     EXPECT_FLOAT_EQ(read_data->at(0).data.at(0), data.data.at(0)); // Accel_X
     EXPECT_FLOAT_EQ(read_data->at(0).data.at(1), data.data.at(1)); // Accel_Y
     EXPECT_FLOAT_EQ(read_data->at(0).data.at(2), data.data.at(2)); // Accel_Z
-
-    delete m2m_csv;
 }
 
 /**
@@ -155,20 +157,19 @@ TEST(M2M_CSV, FAIL_DataFile_Invalid_Column_Name)
     std::string command = "bash test_script.sh FAIL_DataFile_Invalid_Column_Name " + data_file + " " + device_file_2;
     system(command.c_str());
 
-    M2M_CSV *m2m_csv;
+    bool is_m2m_csv_exception = false;
     try
     {
-        m2m_csv = new M2M_CSV(data_file, columns);
+        std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
     }
     catch (...)
     {
         std::cout << "Test case: M2M_CSV.FAIL_DataFile_Invalid_Column_Name, as expected" << std::endl;
-        if (m2m_csv)
-            delete m2m_csv;
+        is_m2m_csv_exception = true;
     }
 
     // Expect not null pointer returned
-    EXPECT_EQ(m2m_csv, nullptr);
+    EXPECT_EQ(is_m2m_csv_exception, true);
 
     // Delete the invalid file after the test case
     command = "sudo rm -f " + data_file;
@@ -184,29 +185,17 @@ TEST(M2M_CSV, FAIL_DataFile_Non_Existing)
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
     std::vector<LINS355Data> *read_data;
 
-    M2M_CSV *m2m_csv;
-    try
-    {
-        m2m_csv = new M2M_CSV(data_file, columns);
-    }
-    catch (const std::runtime_error &e)
-    {
-        std::cout << "Test case: M2M_CSV.FAIL_DataFile_Invalid_Column_Name, as expected" << std::endl;
-        if (m2m_csv)
-            delete m2m_csv;
-    }
+    std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
 
     // Expect not null pointer returned
-    EXPECT_NE(m2m_csv, nullptr);
+    EXPECT_NE(m2m_csv.get(), nullptr);
 
     // Delete the file before running the test case
     std::string command = "bash test_script.sh FAIL_DataFile_Non_Existing " + data_file + " " + device_file_2;
     system(command.c_str());
 
-    read_data = m2m_csv->Read();
+    read_data = m2m_csv.get()->Read();
 
     // Expect null pointer returned
     EXPECT_EQ(read_data, nullptr);
-
-    delete m2m_csv;
 }
