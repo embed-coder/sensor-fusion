@@ -24,9 +24,7 @@
 
 - [About](#about)
 - [Getting Started](#getting_started)
-- [Built](#build)
-- [Deployment](#deployment)
-- [Usage](#usage)
+- [Running the tests](#tests)
 - [TODO](#todo)
 - [Authors](#authors)
 
@@ -80,7 +78,7 @@ Install dependency packages:
 sudo apt update
 sudo apt install -y gcc g++ git autogen autoconf build-essential \
                     cmake graphviz libgtest-dev libtool \
-                    pkg-config libserial-dev
+                    pkg-config libserial-dev socat
 ```
 
 ### ⛏️ Compiling
@@ -108,7 +106,7 @@ Run the automated tests for this SW.
 The output will be like below
 
 ```
-./test_lins355
+sudo ./run_test.sh
 
 ```
 
@@ -117,7 +115,7 @@ The output will be like below
 Run SW with the real device: "./m2m-serial <device_file>"
 
 ```
-./m2m-serial -d /dev/ttyUSB0
+sudo ./m2m-serial -d /dev/ttyUSB0
 ```
 
 ## 📝 Todo <a name="todo"></a>

@@ -16,15 +16,15 @@
 std::vector<LINS355Data> data_queue;
 std::mutex mtx; // mutex for critical section
 
-void read_from_device(LINS355 *device, u_int16_t interval_ms)
+void read_from_device(std::shared_ptr<LINS355> device, u_int16_t interval_ms)
 {
     LINS355Data *lins355_data;
 
     while (true)
     {
-        if (device->IsOpen())
+        if (device.get()->IsOpen())
         {
-            lins355_data = device->ReadData();
+            lins355_data = device.get()->ReadData();
         }
         else
         {
@@ -36,9 +36,9 @@ void read_from_device(LINS355 *device, u_int16_t interval_ms)
             std::cout << "Accel x: " << lins355_data->data.at(0) << std::endl;
             std::cout << "Accel y: " << lins355_data->data.at(1) << std::endl;
             std::cout << "Accel z: " << lins355_data->data.at(2) << std::endl;
-            mtx.lock();
+            std::unique_lock<std::mutex> lck(mtx);
             data_queue.push_back(*lins355_data);
-            mtx.unlock();
+            lck.unlock();
             delete lins355_data;
         }
         usleep(interval_ms * 1000);
@@ -100,10 +100,10 @@ void write_2_csv(const std::string &data_file_prefix, const uint16_t &span_minut
         {
             if (data_queue.empty() == false)
             {
-                mtx.lock();
+                std::unique_lock<std::mutex> lck(mtx);
                 m2m_csv->Write(data_queue.back());
                 data_queue.pop_back();
-                mtx.unlock();
+                lck.unlock();
             }
         }
         usleep(1000);
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     std::string device_file;
     std::string data_file_prefix = "acc";
     uint16_t interval_ms = 10; // 100 HZ = 0.01 s = 10 ms
-    LINS355 *lins355_device;
+    std::shared_ptr<LINS355> lins355_device;
 
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
 
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    lins355_device = new LINS355(device_file, LibSerial::BaudRate::BAUD_115200, 100);
+    lins355_device = std::make_shared<LINS355>(device_file, LibSerial::BaudRate::BAUD_115200, 100);
 
     std::thread lins355_thread(read_from_device, lins355_device, interval_ms);
     std::thread csv_thread(write_2_csv, data_file_prefix, SPAN_MINUTES, columns);
