@@ -36,7 +36,19 @@ public:
     virtual ~M2M_CSV();
     // int Open();
     // void Close();
+    /**
+     * @brief Write LINS355 sensor data to csv file
+     *
+     * @param data
+     * @return int:
+     * return 0 as no error
+     */
     int Write(const LINS355Data &data);
+    /**
+     * @brief Read data and return LINS355 data type
+     *
+     * @return std::vector<LINS355Data>*
+     */
     std::vector<LINS355Data> *Read();
 };
 

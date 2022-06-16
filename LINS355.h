@@ -51,13 +51,17 @@ public:
      * serial port communication speed
      * @param
      * timeout for reading in milisecond
-     * @return int
      */
     LINS355(const std::string &fileName, const LibSerial::BaudRate &baudRate, size_t ms_timeout);
     virtual ~LINS355();
     int Open();
     void Close();
     bool IsOpen();
+    /**
+     * @brief Read data from device
+     *
+     * @return LINS355Data*
+     */
     LINS355Data *ReadData();
 };
 
