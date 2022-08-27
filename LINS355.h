@@ -10,12 +10,12 @@
 #include <vector>
 #include <chrono>
 
-#define DATA_LEN_AFTER_HEAD 35
+#define DATA_LEN_AFTER_HEAD 35 // The len of whole package is 37 bytes, and we read out 2 bytes for the header
 #define TIMEOUT_SERIAL_MS 250
-#define ACCEL_SCALE 20.0f
-#define RATE_SCALE 1260.0f
-#define MAG_SCALE 16.0f
-#define SENSOR_SCALE 65536.0f
+#define ACCEL_SCALE 20.0f     // refer to the datasheet
+#define RATE_SCALE 1260.0f    // refer to the datasheet
+#define MAG_SCALE 16.0f       // refer to the datasheet
+#define SENSOR_SCALE 65536.0f // refer to the datasheet
 
 constexpr const char *const SERIAL_PORT_1 = "/dev/ttyUSB0";
 constexpr const char *const SERIAL_PORT_2 = "/dev/ttyUSB1";

@@ -77,55 +77,68 @@ LINS355Data *LINS355::ReadData()
     {
         try
         {
-            serialPort.Read(read_buffer, 2, timeoutMS);
+            serialPort.Read(read_buffer, 1, timeoutMS);
         }
         catch (const ReadTimeout &)
         {
             std::cerr << "The Read() call timed out waiting for data." << std::endl;
             return NULL;
         }
-        if (0x4C == read_buffer[0] && 0x53 == read_buffer[1])
+        // The header of data package start with 0x4C and 0x53
+        if (0x4C == read_buffer[0])
         {
             try
             {
-                serialPort.Read(read_buffer, DATA_LEN_AFTER_HEAD, timeoutMS);
+                serialPort.Read(read_buffer, 1, timeoutMS);
             }
             catch (const ReadTimeout &)
             {
                 std::cerr << "The Read() call timed out waiting for data." << std::endl;
-                continue;
-            }
-
-            std::cout << std::endl;
-            for (int i = 0; i < DATA_LEN_AFTER_HEAD; i++)
-            {
-                printf("%x ", read_buffer[i]);
-            }
-            std::cout << std::endl;
-
-            crc = (uint16_t)(read_buffer[34] + (read_buffer[33] << 8));
-            if (CalcCRC(read_buffer, DATA_LEN_AFTER_HEAD - 2) != crc)
-            {
-                std::cerr << "CRC error" << std::endl;
                 return NULL;
             }
+            if (0x53 == read_buffer[0])
+            {
+                try
+                {
+                    serialPort.Read(read_buffer, DATA_LEN_AFTER_HEAD, timeoutMS);
+                }
+                catch (const ReadTimeout &)
+                {
+                    std::cerr << "The Read() call timed out waiting for data." << std::endl;
+                    continue;
+                }
 
-            timestamp = std::chrono::system_clock::now();
+                std::cout << std::endl;
+                for (int i = 0; i < DATA_LEN_AFTER_HEAD; i++)
+                {
+                    printf("%x ", read_buffer[i]);
+                }
+                std::cout << std::endl;
 
-            sensors[0] = (uint16_t)(read_buffer[1] + (read_buffer[0] << 8));
-            sensors[1] = (uint16_t)(read_buffer[3] + (read_buffer[2] << 8));
-            sensors[2] = (uint16_t)(read_buffer[5] + (read_buffer[4] << 8));
+                crc = (uint16_t)(read_buffer[34] + (read_buffer[33] << 8));
+                if (CalcCRC(read_buffer, DATA_LEN_AFTER_HEAD - 2) != crc)
+                {
+                    std::cerr << "CRC error" << std::endl;
+                    return NULL;
+                }
 
-            ret_data->timestamp = std::to_string(std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count());
-            // std::cout << "timestamp: " << ret_data->timestamp << std::endl;
-            // Accel x, y, z
-            // std::cout << "Accel_X: " << sensors[0] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
-            ret_data->data.push_back(sensors[0] * ACCEL_SCALE / SENSOR_SCALE);
-            // std::cout << "Accel_Y: " << sensors[1] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
-            ret_data->data.push_back(sensors[1] * ACCEL_SCALE / SENSOR_SCALE);
-            // std::cout << "Accel_Z: " << sensors[2] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
-            ret_data->data.push_back(sensors[2] * ACCEL_SCALE / SENSOR_SCALE);
-            break;
+                timestamp = std::chrono::system_clock::now();
+
+                sensors[0] = (uint16_t)(read_buffer[1] + (read_buffer[0] << 8));
+                sensors[1] = (uint16_t)(read_buffer[3] + (read_buffer[2] << 8));
+                sensors[2] = (uint16_t)(read_buffer[5] + (read_buffer[4] << 8));
+
+                ret_data->timestamp = std::to_string(std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count());
+                // std::cout << "timestamp: " << ret_data->timestamp << std::endl;
+                // Accel x, y, z
+                // std::cout << "Accel_X: " << sensors[0] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+                ret_data->data.push_back(sensors[0] * ACCEL_SCALE / SENSOR_SCALE);
+                // std::cout << "Accel_Y: " << sensors[1] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+                ret_data->data.push_back(sensors[1] * ACCEL_SCALE / SENSOR_SCALE);
+                // std::cout << "Accel_Z: " << sensors[2] * ACCEL_SCALE / SENSOR_SCALE << std::endl;
+                ret_data->data.push_back(sensors[2] * ACCEL_SCALE / SENSOR_SCALE);
+                break;
+            }
         }
         usleep(1000);
     }
