@@ -130,4 +130,4 @@ The Bucket list for the future implemented features:
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@embedcoder](https://github.com/kylelobo) - Idea & Initial work
+- [@embedcoder](https://github.com/embed-coder) - Idea & Initial work
