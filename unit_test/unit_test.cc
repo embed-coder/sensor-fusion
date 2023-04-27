@@ -10,8 +10,8 @@
 #include <memory>
 #include <stdexcept>
 
-#include "../LINS355.h"
-#include "../m2m_csv.h"
+#include "../lins355/LINS355.h"
+#include "../m2m_csv/m2m_csv.h"
 
 #define DEVICE_FILE_1 "/dev/ttyUSB0"
 #define DEVICE_FILE_2 "/dev/ttyUSB1"
@@ -64,8 +64,8 @@ TEST(LINS355_Device, OK)
 
     // Read data
     std::thread read_thread(read_from_device, lins355_test.get(), 1);
-    // system("bash test_script.sh LINS355_Device_OK");
-    std::string command = "bash test_script.sh LINS355_Device_OK " + data_file + " " + device_file_2;
+    // system("bash fake_data.sh LINS355_Device_OK");
+    std::string command = "bash fake_data.sh LINS355_Device_OK " + data_file + " " + device_file_2;
     system(command.c_str());
     read_thread.join();
 
@@ -99,8 +99,8 @@ TEST(LINS355_Device, FAIL_CRC_Error)
 
     // Read data
     std::thread read_thread(read_from_device, lins355_test.get(), 1);
-    // system("bash test_script.sh FAIL_CRC");
-    std::string command = "bash test_script.sh FAIL_CRC " + data_file + " " + device_file_2;
+    // system("bash fake_data.sh FAIL_CRC");
+    std::string command = "bash fake_data.sh FAIL_CRC " + data_file + " " + device_file_2;
     system(command.c_str());
     read_thread.join();
 
@@ -154,7 +154,7 @@ TEST(M2M_CSV, FAIL_DataFile_Invalid_Column_Name)
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
 
     // Create an invalid colomn name data file
-    std::string command = "bash test_script.sh FAIL_DataFile_Invalid_Column_Name " + data_file + " " + device_file_2;
+    std::string command = "bash fake_data.sh FAIL_DataFile_Invalid_Column_Name " + data_file + " " + device_file_2;
     system(command.c_str());
 
     bool is_m2m_csv_exception = false;
@@ -191,7 +191,7 @@ TEST(M2M_CSV, FAIL_DataFile_Non_Existing)
     EXPECT_NE(m2m_csv.get(), nullptr);
 
     // Delete the file before running the test case
-    std::string command = "bash test_script.sh FAIL_DataFile_Non_Existing " + data_file + " " + device_file_2;
+    std::string command = "bash fake_data.sh FAIL_DataFile_Non_Existing " + data_file + " " + device_file_2;
     system(command.c_str());
 
     read_data = m2m_csv.get()->Read();
