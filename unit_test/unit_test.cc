@@ -57,7 +57,7 @@ void get_env()
 TEST(LINS355_Device, OK)
 {
     get_env();
-    std::auto_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
+    std::unique_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
 
     // Expect port is openned
     EXPECT_EQ(lins355_test.get()->IsOpen(), true);
@@ -92,7 +92,7 @@ TEST(LINS355_Device, OK)
  */
 TEST(LINS355_Device, FAIL_CRC_Error)
 {
-    std::auto_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
+    std::unique_ptr<LINS355> lins355_test(new LINS355(device_file_1, LibSerial::BaudRate::BAUD_115200, 100));
 
     // Expect port is openned
     EXPECT_EQ(lins355_test.get()->IsOpen(), true);
@@ -122,7 +122,7 @@ TEST(LINS355_Device, FAIL_CRC_Error)
 TEST(M2M_CSV, OK)
 {
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
-    std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
+    std::unique_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
     LINS355Data data{
         .timestamp = "1655163581",
         .data = {
@@ -160,7 +160,7 @@ TEST(M2M_CSV, FAIL_DataFile_Invalid_Column_Name)
     bool is_m2m_csv_exception = false;
     try
     {
-        std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
+        std::unique_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
     }
     catch (...)
     {
@@ -185,7 +185,7 @@ TEST(M2M_CSV, FAIL_DataFile_Non_Existing)
     std::vector<std::string> columns{"Timestamp (UTC)", "Acc_x", "Acc_y", "Acc_z"};
     std::vector<LINS355Data> *read_data;
 
-    std::auto_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
+    std::unique_ptr<M2M_CSV> m2m_csv(new M2M_CSV(data_file, columns));
 
     // Expect not null pointer returned
     EXPECT_NE(m2m_csv.get(), nullptr);
