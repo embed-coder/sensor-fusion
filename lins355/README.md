@@ -1,20 +1,22 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="icon.png" alt="Project logo"></a>
+ <img width=200px height=200px src="./lins355.png" alt="Project logo"></a>
 </p>
+
+<h3 align="center">LINS355 Acceleration Sensor</h3>
 
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/embed-coder/sensor-fusion?style=plastic)](https://github.com/embed-coder/sensor-fusion/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/embed-coder/sensor-fusion)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues/embed-coder/LINS355-accelerator?style=plastic)](https://github.com/embed-coder/LINS355-accelerator/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/embed-coder/LINS355-accelerator)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
 
 ---
 
-<p align="center"> Multiple sensor connections, communicaions, storing, and forwarding data.
+<p align="center"> Read acceleration data from sensor LINS355.
     <br> 
 </p>
 
@@ -28,11 +30,35 @@
 
 ## 🧐 About <a name = "about"></a>
 
-SensorFusion collects and controls data from various types of sensors. It allows users to receive data from sensors and send commands to control them. SensorFusion also provides a platform to store data received from sensors into databases and forward them to the cloud. With SensorFusion, users can easily integrate and manage different types of sensors in their projects.
+Get the sensor data and save it as a CSV file of the following format.
 
-Sensor Fusion config every sensor independently, enable/disable without impact to other sensors' operation.
+<table>
+  <tr>
+    <th>Timestamp (UTC)</th>
+    <th>Acc_x</th>
+    <th>Acc_y</th>
+    <th>Acc_z</th>
+  </tr>
+  <tr>
+    <th>1633436700083</th>
+    <th>0.026935</th>
+    <th>0.02394</th>
+    <th>9.79528</th>
+  </tr>
+  <tr>
+    <th>...</th>
+    <th>...</th>
+    <th>...</th>
+    <th>...</th>
+  </tr>
+</table>
 
-Data will be store into database and optional to a CSV file with configurable path and frequency.
+A new CSV file will be created every 5mins in a configurable path of your choice.
+
+Each CSV file should contain all the 100Hz acceleration data within the 5mins span:
+
+The naming convention of each file shall be:
+acc_YYYYMMDD_hhmm.csv. For eg, “acc_20220609_1240.csv”
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -43,17 +69,16 @@ Clone project from this repository or download the source files in compressed fo
 Dependencies:
 
 - cmake
-- googletest
 - libserial-dev
-- socat
+- googletest
 
 Install dependency packages:
 
 ```
 sudo apt update
-sudo apt install -y autogen autoconf build-essential cmake\
-                    gcc git graphviz g++ libgtest-dev libserial-dev libtool\
-                    pkg-config  socat
+sudo apt install -y gcc g++ git autogen autoconf build-essential \
+                    cmake graphviz libgtest-dev libtool \
+                    pkg-config libserial-dev socat
 ```
 
 ### ⛏️ Compiling

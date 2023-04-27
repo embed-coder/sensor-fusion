@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <ctime>
 
-#include "LINS355.h"
-#include "m2m_csv.h"
+#include "lins355/LINS355.h"
+#include "m2m_csv/m2m_csv.h"
 
 #define DEVICE_FILE "/dev/ttyUSB0"
 #define DATA_FILE "data.csv"

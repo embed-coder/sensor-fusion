@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "LINS355.h"
+#include "../lins355/LINS355.h"
 
 class M2M_CSV
 {

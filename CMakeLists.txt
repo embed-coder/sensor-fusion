@@ -5,14 +5,18 @@ project(data_structures_and_algorithms VERSION 0.1.0)
 
 set(
     LINS355_SOURCES
-    LINS355.cpp
-    m2m_csv.cpp
+    lins355/LINS355.cpp
+)
+
+set(
+    CSV_SOURCES
+    m2m_csv/m2m_csv.cpp
 )
 
 set(CMAKE_INSTALL_RPATH "/usr/local/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_library(lins355_static STATIC ${LINS355_SOURCES})
+add_library(lins355_static STATIC ${LINS355_SOURCES} ${CSV_SOURCES})
 
 include(CTest)
 enable_testing()
@@ -23,6 +27,7 @@ add_executable(
     
     main.cpp
     ${LINS355_SOURCES}
+    ${CSV_SOURCES}
 )
 
 # include dir
@@ -48,7 +53,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(
-    # libserial
+    # lins355
     unit_test
 )
 
