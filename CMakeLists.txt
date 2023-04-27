@@ -26,10 +26,10 @@ add_executable(
 )
 
 # include dir
-include_directories(
-    libserial
-    libserial/src
-)
+# include_directories(
+#     libserial
+#     libserial/src
+# )
 
 # Directories of 3rd lib
 # link_directories(
@@ -41,7 +41,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # specify the C++ standard
-# set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
