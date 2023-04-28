@@ -28,11 +28,11 @@
 
 ## 🧐 About <a name = "about"></a>
 
-SensorFusion collects and controls data from various types of sensors. It allows users to receive data from sensors and send commands to control them. SensorFusion also provides a platform to store data received from sensors into databases and forward them to the cloud. With SensorFusion, users can easily integrate and manage different types of sensors in their projects.
+SensorFusion collects and controls data from various types of sensors. It allows users to receive data from sensors and send commands to control them. SensorFusion also provides a platform to store data received from sensors in databases and forward them to the cloud. With SensorFusion, users can easily integrate and manage different types of sensors in their projects.
 
-Sensor Fusion config every sensor independently, enable/disable without impact to other sensors' operation.
+Sensor Fusion config every sensor independently, enabling/disabling without impact to other sensors' operation.
 
-Data will be store into database and optional to a CSV file with configurable path and frequency.
+Data will be stored in the database and optional to a CSV file with configurable path and frequency.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
