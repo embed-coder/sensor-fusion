@@ -5,30 +5,31 @@
 ################################################################
 
 OUTPUTDIR=""
-VERSION="0.0.1"
-BUILDLOG="build.log"
+VERSION="0.0.2"
+BUILDLOG="${PWD}/build.log"
 
 log() {
     echo -e "${@}"  | tee -a ${BUILDLOG}
 }
 
 info() {
-    echo -e "\033[1m[INFO] \033[0m" $@ | tee -a ${BUILDLOG}
+    echo -e "\e[36m[INFO]" ${@}"\e[0m" | tee >(sed 's/\x1b\[[0-9;]*m//g' >> ${BUILDLOG})
 }
 
 error() {
-    echo -e "\033[1m[ERROR]\033[0m" $@ | tee -a ${BUILDLOG}
+    echo -e "\e[31m[ERROR]" ${@}"\e[0m" | tee >(sed 's/\x1b\[[0-9;]*m//g' >> ${BUILDLOG})
 }
 
 warn() {
-    echo -e "\033[1m[WARN] \033[0m" $@ | tee -a ${BUILDLOG}
+    echo -e "\e[33m[WARN]" ${@}"\e[0m" | tee >(sed 's/\x1b\[[0-9;]*m//g' >> ${BUILDLOG})
 }
 
 ask()
 {
+    echo -en "\e[35m${1} (y/n)?\e[0m "
     while [ 1 ]; do
-        read -p "$1 (y/n)?" choice
-        case "$choice" in 
+        read CHOICE
+        case "${CHOICE}" in 
             y|Y ) 
                 return 0
                 ;;
@@ -46,10 +47,11 @@ rm ${BUILDLOG}
 
 info "\n\
 ================================================================================\n\
-Start compiling Software and release bin files for LINS355\n\
+Start compiling Sensor Fusion and release bin files\n\
 Info:\n\
 - 3rd: libserial, googletest\n\
 - Version: ${VERSION}\n\
+- Log: ${BUILDLOG}\n\
 ================================================================================\n\
 "
 
@@ -62,8 +64,8 @@ export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib/
 
 mkdir build
 cd build
-cmake ..  | tee -a ${BUILDLOG}
-make  | tee -a ${BUILDLOG}
+cmake .. 2>&1 | tee -a ${BUILDLOG}
+make 2>&1 | tee -a ${BUILDLOG}
 mkdir ../release
 cp m2m-serial ../
 cp unit_test/test_lins355 ../
