@@ -53,7 +53,7 @@ Install dependency packages:
 sudo apt update
 sudo apt install -y autogen autoconf build-essential cmake\
                     gcc git graphviz g++ libgtest-dev libserial-dev libtool\
-                    pkg-config  socat
+                    pkg-config socat
 ```
 
 ### ⛏️ Compiling

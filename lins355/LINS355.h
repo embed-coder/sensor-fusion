@@ -1,7 +1,7 @@
 #ifndef LINS355_H
 #define LINS355_H
 
-#include <libserial/SerialPort.h>
+#include <SerialPort.h>
 
 #include <cstdlib>
 #include <fstream>
