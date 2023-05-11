@@ -29,7 +29,7 @@ target_link_libraries(
     test_lins355
 
     gtest_main
-    lins355_static
+    sensor-fusion_static
     serial
 )
 

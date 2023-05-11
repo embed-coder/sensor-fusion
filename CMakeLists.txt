@@ -16,7 +16,7 @@ set(
 set(CMAKE_INSTALL_RPATH "/usr/local/lib" "/usr/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_library(lins355_static STATIC ${LINS355_SOURCES} ${CSV_SOURCES})
+add_library(sensor-fusion_static STATIC ${LINS355_SOURCES} ${CSV_SOURCES})
 
 include(CTest)
 enable_testing()
