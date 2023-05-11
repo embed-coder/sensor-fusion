@@ -112,7 +112,7 @@ while true; do
 done
 
 if [ ${CLEAN} -eq 1 ]; then
-  ask "Are you sure to continue clean the previous build packages"
+  ask "Are you sure to continue cleaning the previous build and releases"
   if [ ${?} -ne 0 ]; then
       exit 4
   fi
