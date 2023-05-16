@@ -92,6 +92,11 @@ version() {
   echo -e "Version: ${VERSION}, created on by John Nguyen.\n"
 }
 
+if [ ${#} -eq 0 ]; then
+  help
+  exit 0
+fi
+
 # Parsing arguments from console
 OPTIONS=$(getopt -l all,clean,core:,folder:,help,package:,thread:,version,verbose -- acC:f:hp:t:vV "$@") || exit 1
 eval set -- "$OPTIONS"
