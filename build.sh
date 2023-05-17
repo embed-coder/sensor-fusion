@@ -8,8 +8,10 @@ BINARYFILES="m2m-serial test_lins355"
 BUILDDIR="build"
 BUILDLOG="${PWD}/build.log"
 BUILDTYPE=""
+CLEAN=0
 OUTPUTDIR=""
 RELEASEDIR="release"
+TARGET="x64"
 VERSION="0.0.2"
 
 ask()
@@ -66,10 +68,13 @@ Usage: ${0} [OPTIONS]
 
   -h, --help                Display this help
 
-  -p, --package   <name>    Specify the name package need to build.
+  -p, --package   <name>    Specify the package's name need to build.
                             - If no input, script exits.
 
-  -t, --thread    <number>  Number of threads can run. The more thread, the faster compiling process running.
+  -t, --target    <name>    Specify the target's name need to build. E.g.: x64, rpi
+                            - If no input, default is x86 linux pc.
+  
+  -T, --thread    <number>  Number of threads can run. The more thread, the faster compiling process running.
                             - If no input, default is number of core.
 
   -v, -version,             Version credit info.
@@ -84,6 +89,8 @@ Example:
   ${0} -a
 # Re-build only specific package
   ${0} -p <package_name>
+# Re-build the whole firmware with specific target
+  ${0} -a -t rpi
 EOF
   # EOF is found above and hence cat command stops reading. This is equivalent to echo but much neater when printing out.
 }
@@ -98,7 +105,7 @@ if [ ${#} -eq 0 ]; then
 fi
 
 # Parsing arguments from console
-OPTIONS=$(getopt -l all,clean,core:,folder:,help,package:,thread:,version,verbose -- acC:f:hp:t:vV "$@") || exit 1
+OPTIONS=$(getopt -l all,clean,core:,folder:,help,package:,target:,thread:,version,verbose -- acC:f:hp:t:T:vV "$@") || exit 1
 eval set -- "$OPTIONS"
 while true; do
   case "$1" in
@@ -108,7 +115,8 @@ while true; do
   -F|--folder) FOLDER=${2}; shift 2;;
   -h|--help) help; exit 0;;
   -p|--package) BUILDTYPE="package" && PACKAGE=${2}; shift 2;;
-  -t|--thread) THREAD=${2}; shift 2;;
+  -t|--target) TARGET=${2}; shift 2;;
+  -T|--thread) THREAD=${2}; shift 2;;
   -v|--version) version; exit 0;;
   -V|--verbose) VERBOSE=1; set -xv; shift;;
   --) shift; break;;
@@ -123,9 +131,22 @@ if [ ${CLEAN} -eq 1 ]; then
   fi
   rm -rf ${BINARYFILES} ${BUILDDIR} ${BUILDLOG} ${RELEASEDIR}
   info "Project was cleaned!"
-  if [ "${BUILDTYPE}" == "" ]; then
-    exit 0
-  fi
+fi
+
+if [ "${BUILDTYPE}" == "" ]; then
+  error "No specification for build type. Have to build with option '-a' or '-p <package_name>'."
+  exit 0
+fi
+
+if [[ ${HOSTNAME} == *"raspberry"* ]]; then
+    # Raspberry Pi-specific configuration
+    info "Raspberry Pi environment detected."
+    TARGET="rpi"
+    # Additional Raspberry Pi specific configurations can be added here
+else
+    # Non-Raspberry Pi configuration
+    echo "Non-Raspberry Pi environment detected."
+    # Additional non-Raspberry Pi specific configurations can be added here
 fi
 
 rm ${BUILDLOG}
@@ -137,6 +158,7 @@ Info:\n\
 - 3rd: libserial, googletest\n\
 - Version: ${VERSION}\n\
 - Build type: ${BUILDTYPE}\n\
+- Target: ${TARGET}\n\
 - Log: ${BUILDLOG}\n\
 ================================================================================\n\
 "
@@ -144,7 +166,9 @@ Info:\n\
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib/
 
 if [ "${BUILDTYPE}" == "all" ]; then
-  mkdir ${BUILDDIR}
+  if [ ! -d ${BUILDDIR} ]; then
+    mkdir ${BUILDDIR}
+  fi
   cd ${BUILDDIR}
   cmake .. 2>&1 | tee -a ${BUILDLOG}
   make 2>&1 | tee -a ${BUILDLOG}
