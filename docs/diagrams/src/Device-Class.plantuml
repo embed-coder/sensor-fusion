@@ -1,0 +1,56 @@
+@startuml Device-Class
+together {
+    interface Device <<interface>> {
+        # id: String
+        # type: String
+        # brand: String
+        # model: String
+        # serialNumber: String
+        # name: String
+        # channel: String
+        # endpoint: String
+        # interval: Integer
+        # meta: Object
+
+        + open(): Integer
+        + setup(): Integer
+        + close(): Integer
+        + getData(): Object
+        + control(): List[Byte]
+    }
+    note right of Device::endpoint {
+        endpoint: Select the target endpoints that
+        registered to the Distributor
+    }
+    note right of Device::meta {
+        meta: {"postcode": <Integer>,
+        "address_number": <Integer>,
+        "street": <String>,
+        "unit": <number-number>}
+    }
+
+    Device <|-- BACnet
+    Device <|-- Bluetooth
+    Device <|-- EDDYSTONE
+    Device <|-- Camera
+    Device <|-- GPIO
+    Device <|-- LORA
+    Device <|-- Modbus
+    Device <|-- NMEA
+    Device <|-- Serial
+    note top of Serial {
+        CRC function will be loaded from cloud.
+        The implementation will depend on the device.
+        Or allow users to implement it based on provided frame.
+        The frame will be on different programming languages.
+        Eventually, it will be compiled on the cloud and downloaded to the Device.
+    }
+    Device <|-- SNMP
+}
+
+together {
+    
+}
+
+' LORA -[hidden]-> EndPoint
+@enduml

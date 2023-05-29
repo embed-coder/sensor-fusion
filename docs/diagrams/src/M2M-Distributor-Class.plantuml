@@ -1,0 +1,20 @@
+@startuml M2M-Distributor
+class M2M-Distributor {
+    - inPort: Integer
+
+    - dataIn()
+    - dataOut()
+    - refreshEndpoints()
+}
+note right of M2M-Distributor::dataIn {
+    Interrupt function: Whenever there is data in.
+}
+note right of M2M-Distributor::dataOut {
+    Fan out data to the target Endpoints.
+    The Data send from Devices will include
+    the detail about the target Endpoints.
+}
+note right of M2M-Distributor::refreshEndpoints {
+    Keep the list of registered Endpoints refreshenned.
+}
+@enduml

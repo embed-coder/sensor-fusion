@@ -1,0 +1,119 @@
+@startuml Endpoint
+together {
+    enum EndpointType {
+        CLOUD
+        FILE
+    }
+
+    interface Endpoint <<interface>> {
+        # type: EndpointType
+        # inPort: Integer
+        # location: String
+
+        + getType(): EndpointType
+        + setType(type: EndpointType)
+        + getLocation(): String
+        + setLocation(location: String)
+
+        # receiveData()
+    }
+    note right of Endpoint::type {
+        type: CLOUD or FILE
+    }
+    note right of Endpoint::inPort {
+        inPort: The port number take in Data
+    }
+    note right of Endpoint::location {
+        location: The url of the cloud or the path of file
+    }
+}
+
+together {
+    enum Protocol {
+        HTTPS
+        KAFKA
+        MQTTS
+        OSPLDDS
+        RTIDDS
+    }
+    abstract CloudEndpoint <<abstract>> {
+        # cert: String
+        # port: Integer
+        # protocol: Protocol
+
+        + getCert(): String
+        + setCert(file: String)
+        + getProtocol(): Protocol
+        + setProtocol(protocol: Protocol)
+        # abstract sendOut()
+    }
+    note right of CloudEndpoint::cert {
+        cert: The path to the cert file
+    }
+    note right of CloudEndpoint::port {
+        port: The port number for sending Data out
+    }
+    note right of CloudEndpoint::protocol {
+        Protocol will be auto selected once
+        object of the specific protocol created.
+        # HTTPS
+        # MQTTS
+        # OSPLDDS
+        # RTIDDS
+    }
+    Endpoint <|-- CloudEndpoint
+    
+    CloudEndpoint <|-- HTTPS
+    class KAFKA {
+        - groupId: Integer
+        - partitionId: Integer
+        - topic: String
+
+        + getGroupId(): Integer
+        + setGroupId(id: Integer)
+        + getPartitionId(): Integer
+        + setPartitionId(id: Integer)
+        + getTopic(): String
+        + setTopic(topic: String)
+    }
+    CloudEndpoint <|-- KAFKA
+    class MQTTS {
+        - topic: String
+
+        + getTopic(): String
+        + setTopic(topic: String)
+    }
+    CloudEndpoint <|-- MQTTS
+    CloudEndpoint <|-- OSPLDDS
+    CloudEndpoint <|-- RTIDDS
+
+together {
+    enum FileType {
+        CSV
+        JSON
+        XML
+    }
+    abstract FileEndpoint <<abstract>> {
+        # fileType: FileType
+        # password: String
+
+        + getFileType(): FileType
+        + setFileType(fileType: FileType)
+        # abstract writeOut()
+    }
+    note right of FileEndpoint::fileType {
+        File type will be auto selected once
+        object of the specific file created.
+        # CSV
+        # JSON
+        # XML
+    }
+    note right of FileEndpoint::password {
+        password: Password protection
+    }
+    Endpoint <|-- FileEndpoint
+    FileEndpoint <|-- CSV
+    FileEndpoint <|-- JSON
+    FileEndpoint <|-- XML
+}
+@enduml

@@ -1,0 +1,39 @@
+@startuml M-Config
+class M-Config <<Singleton>> {
+    - M-Config() = default
+
+    + static getInstance(): M-Config&
+    + M-Config(const M-Config&) = delete
+    + M-Config& operator=(const M-Config&) = delete
+
+    + getChannels(): Channel[]
+    + registerChannel(channel: Channel)
+    + getDevices(): Device[]
+    + registerDevice(channel: Device)
+    + getEndpoints(): Endpoint[]
+    + registerEndpoint(endpoint: Endpoint)
+}
+note top of M-Config {
+    Composition of all utility functions for
+    interacting with machine's configurations.
+}
+note right of M-Config::M-Config {
+    Delete copy constructor and assignment operator.
+}
+note right of M-Config::getInstance {
+    Public method to access the instance of the class.
+    "static M-Config& getInstance() {
+        static M-Config instance;
+        return instance;
+    }"
+}
+note right of M-Config::getEndpoints {
+    Get the list of Endpoints.
+    The function will be called when creating a new device
+    so it can know which target endpoint is available.
+}
+note right of M-Config::registerEndpoint {
+    Register the new Endpoint to the configurations.
+    Call it when creating a new endpoint.
+}
+@enduml
