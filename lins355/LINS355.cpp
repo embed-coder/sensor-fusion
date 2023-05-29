@@ -116,6 +116,7 @@ LINS355Data *LINS355::ReadData()
                 std::cout << std::endl;
 
                 crc = (uint16_t)(read_buffer[34] + (read_buffer[33] << 8));
+                // Exclude 2 last bytes of CRC
                 if (CalcCRC(read_buffer, DATA_LEN_AFTER_HEAD - 2) != crc)
                 {
                     std::cerr << "CRC error" << std::endl;
