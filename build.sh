@@ -131,11 +131,14 @@ if [ ${CLEAN} -eq 1 ]; then
   fi
   rm -rf ${BINARYFILES} ${BUILDDIR} ${BUILDLOG} ${RELEASEDIR}
   info "Project was cleaned!"
+  if [ "${BUILDTYPE}" == "" ]; then
+    exit 0
+  fi
 fi
 
 if [ "${BUILDTYPE}" == "" ]; then
   error "No specification for build type. Have to build with option '-a' or '-p <package_name>'."
-  exit 0
+  exit 4
 fi
 
 if [[ ${HOSTNAME} == *"raspberry"* ]]; then
