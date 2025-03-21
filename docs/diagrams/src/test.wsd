@@ -1,0 +1,71 @@
+@startuml Test
+together tg1 {
+  class MyClass {
+    + attribute1 : Integer
+  }
+  note right of MyClass
+    This is a note.
+    It describes MyClass.
+  end note
+}
+
+together tg2 {
+  class MyClass1 {
+    - attribute1 : Integer
+    - attribute2 : String
+  }
+  note right
+    - attribute1: represents the count of items.
+    - attribute2: holds some descriptive text.
+  end note
+}
+tg1 -[hidden]- tg2
+
+together tg3 {
+  class MyClass2 {
+    + attribute1 : Integer
+  }
+  class MyClass3 {
+    + attribute1 : Integer
+  }
+  note "This note applies to both classes." as N1
+  MyClass2 .. N1
+  MyClass3 .. N1
+}
+
+together tg4 {
+  enum DaysOfWeek {
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+    Sunday
+  }
+  class MyClass4 {
+    + day : DaysOfWeek
+  }
+  DaysOfWeek -[hidden]- MyClass4
+}
+
+together tg5 {
+  Class5 -[hidden]- Class7
+  Class6 -[hidden]- Class7
+  class Class5
+  class Class6
+  class Class7
+}
+
+together tg6 {
+  class Class8
+  class Class9
+  Class8 --> Class9: pointer
+}
+
+together tg7 {
+  class Student
+  class Course
+  Student "1" -- "0..*" Course
+}
+@enduml

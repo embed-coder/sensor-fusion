@@ -40,7 +40,10 @@ set(
 set(CMAKE_INSTALL_RPATH "/usr/local/lib" "/usr/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_library(sensor-fusion_static STATIC ${LINS355_SOURCES} ${CSV_SOURCES})
+add_library(sensor-fusion_static STATIC ${LINS355_SOURCES} ${CSV_SOURCES}
+        main.cpp
+        main.cpp
+        main.cpp)
 
 include(CTest)
 enable_testing()
@@ -77,9 +80,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Set debug flag
 set(CMAKE_BUILD_TYPE Debug)
 
-add_subdirectory(
-    unit_test
-)
+#add_subdirectory(
+#    unit_test
+#)
 
 # Link neccessary libraries, include 3rd libraries
 target_link_libraries(
