@@ -1,5 +1,6 @@
 # IDE's dependencies
 .vscode
+.idea
 
 # 3rd libraries
 googletest
@@ -10,6 +11,11 @@ build
 build.log
 m2m-serial
 test_lins355
+cmake-build-debug
+cmmake-build-release
 
 # Runtime output
 *.csv
+
+# Generate documents
+docs/diagrams/out/*.png
