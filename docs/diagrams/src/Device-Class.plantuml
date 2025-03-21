@@ -1,5 +1,20 @@
 @startuml Device-Class
 together {
+    enum DeviceStatus {
+        UNCONFIRMED
+        CONNECTED
+        DISCONNECTED
+    }
+    note right of DeviceStatus::UNCONFIRMED {
+        Detected device but not yet connected
+    }
+    note right of DeviceStatus::CONNECTED {
+        Device is connected and operating well
+    }
+    note right of DeviceStatus::DISCONNECTED {
+        Device is disconnected or not operating well
+    }
+
     interface Device <<interface>> {
         # id: String
         # type: String
@@ -10,6 +25,7 @@ together {
         # channel: String
         # endpoint: String
         # interval: Integer
+        # status: DeviceStatus
         # meta: Object
 
         + open(): Integer
@@ -17,6 +33,7 @@ together {
         + close(): Integer
         + getData(): Object
         + control(): List[Byte]
+        + getStatus(): DeviceStatus
     }
     note right of Device::endpoint {
         endpoint: Select the target endpoints that
@@ -34,9 +51,14 @@ together {
     Device <|-- EDDYSTONE
     Device <|-- Camera
     Device <|-- GPIO
+    Device <|-- HL7
+    Device <|-- IEC104                                                                                
     Device <|-- LORA
     Device <|-- Modbus
     Device <|-- NMEA
+    Device <|-- OCPP
+    Device <|-- OpcDA
+    Device <|-- OpcUA
     Device <|-- Serial
     note top of Serial {
         CRC function will be loaded from cloud.
@@ -46,6 +68,8 @@ together {
         Eventually, it will be compiled on the cloud and downloaded to the Device.
     }
     Device <|-- SNMP
+    Device <|-- Telemetry
+    Device <|-- Zigbee
 }
 
 together {
