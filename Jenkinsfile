@@ -1,5 +1,11 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'jnlp-agent'
+      defaultContainer 'jnlp'
+    }
+  }
+  
   stages {
     stage('error') {
       steps {
