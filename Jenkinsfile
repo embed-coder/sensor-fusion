@@ -1,10 +1,10 @@
 pipeline {
   agent any
   stages {
-    stage('') {
+    stage('error') {
       steps {
-        sh '''sudo apt update
-sudo apt install -y gcc g++ git autogen autoconf \\
+        sh '''apt update
+apt install -y gcc g++ git autogen autoconf \\
                     build-essential cmake graphviz \\
                     libgtest-dev libtool pkg-config \\
                     libserial-dev
