@@ -1,13 +1,13 @@
 pipeline {
   agent {
     kubernetes {
-      label 'jenkins-agent'
-      defaultContainer 'jenkins-container'
+      label 'jnlp-agent'
+      defaultContainer 'jnlp'
     }
   }
   
   stages {
-    stage('error') {
+    stage('build') {
       steps {
         sh '''apt update
 apt install -y gcc g++ git autogen autoconf \\
