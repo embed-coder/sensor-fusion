@@ -1,4 +1,10 @@
 pipeline {
+  agent {
+    kubernetes {
+      label 'jnlp-agent'
+    }
+  }
+  
   stages {
     stage('build') {
       steps {
