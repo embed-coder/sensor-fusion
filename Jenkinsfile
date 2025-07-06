@@ -18,13 +18,7 @@ spec:
   stages {
     stage('build') {
       steps {
-        sh '''apt update
-apt install -y gcc g++ git autogen autoconf \\
-                    build-essential cmake graphviz \\
-                    libgtest-dev libtool pkg-config \\
-                    libserial-dev
-
-./build.sh'''
+        sh './build.sh'
       }
     }
 
