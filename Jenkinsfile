@@ -1,7 +1,7 @@
 pipeline {
   agent {
     kubernetes {
-      label 'jnlp-agent'
+      inheritFrom 'jnlp-agent'
     }
   }
   
