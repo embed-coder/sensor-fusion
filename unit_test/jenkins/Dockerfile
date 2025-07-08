@@ -8,4 +8,13 @@ RUN apt update && apt install -y \
     libserial-dev \
  && apt clean
 
+# Create a new writable cert directory
+RUN mkdir -p /usr/local/share/ca-certificates && \
+    chmod -R 777 /usr/local/share/ca-certificates
+
+COPY jenkins-local.crt /usr/local/share/ca-certificates/
+
+# Update certs to a new writable output
+RUN update-ca-certificates
+
 USER jenkins
