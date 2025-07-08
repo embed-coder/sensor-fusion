@@ -101,7 +101,7 @@ version() {
 
 if [ ${#} -eq 0 ]; then
   help
-  exit 0
+  exit 1
 fi
 
 # Parsing arguments from console
