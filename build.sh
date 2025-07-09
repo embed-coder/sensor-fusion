@@ -195,3 +195,5 @@ info "\n\
 The compiling process is done, please refer to README file for how to test!\n\
 ================================================================================\n\
 "
+
+exit 0
