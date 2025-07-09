@@ -4,6 +4,10 @@ pipeline {
       inheritFrom 'jnlp-agent'
     }
   }
+
+  triggers {
+      githubPush()
+  }
   
   stages {
     stage('build') {
